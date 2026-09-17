@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
@@ -28,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -37,13 +40,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.newsly.data.model.NewsArticle
+import com.example.newsly.ui.theme.CoralAccent
 import com.example.newsly.ui.theme.Indigo600
 import com.example.newsly.ui.theme.PureWhite
-import com.example.newsly.ui.theme.Slate200
 import com.example.newsly.ui.theme.Slate400
 import com.example.newsly.ui.theme.Slate500
-import com.example.newsly.ui.theme.Slate700
-import com.example.newsly.ui.theme.Slate900
 
 @Composable
 fun NewsCard(
@@ -53,63 +54,98 @@ fun NewsCard(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val hasVideo = com.example.newsly.util.VideoUrlValidator.isValidPlayableVideoUrl(article.videoUrl)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp), spotColor = Slate400.copy(alpha = 0.2f))
             .clip(RoundedCornerShape(16.dp))
-            .background(PureWhite)
-            .border(width = 1.dp, color = Slate200, shape = RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .border(width = 1.dp, color = MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(16.dp))
             .clickable { onArticleClick(article) }
             .padding(14.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            // Optional Card Image Banner
+            // Optional Card Image Banner with Video Badge
             if (!article.imageUrl.isNullOrBlank()) {
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(article.imageUrl)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = article.title,
-                    contentScale = ContentScale.Crop,
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
+                        .height(160.dp)
                         .clip(RoundedCornerShape(12.dp))
-                )
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(context)
+                            .data(article.imageUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = article.title,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.matchParentSize()
+                    )
+
+                    // Video overlay badge if video is present
+                    if (hasVideo) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(8.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color.Black.copy(alpha = 0.75f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.PlayArrow,
+                                    contentDescription = "Play Video",
+                                    tint = PureWhite,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Text(
+                                    text = if (!article.videoDuration.isNullOrBlank()) "VIDEO • ${article.videoDuration}" else "VIDEO",
+                                    color = PureWhite,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             // Category tag
             Text(
                 text = article.category.uppercase(),
-                color = Indigo600,
+                color = CoralAccent,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 0.5.sp,
                 style = MaterialTheme.typography.titleSmall
             )
 
-            // Headline (18-20sp SemiBold/Bold)
+            // Headline
             Text(
                 text = article.title,
-                color = Slate900,
-                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.Bold,
-                lineHeight = 24.sp,
+                lineHeight = 23.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
 
-            // Short description (14-15sp Regular)
+            // Short description
             if (!article.description.isNullOrBlank()) {
                 Text(
                     text = article.description,
-                    color = Slate700,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 13.sp,
+                    lineHeight = 19.sp,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodyMedium
@@ -129,7 +165,7 @@ fun NewsCard(
                 ) {
                     Text(
                         text = article.sourceName,
-                        color = Slate900,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -140,7 +176,7 @@ fun NewsCard(
                     )
                     Text(
                         text = article.getFormattedTimeAgo(),
-                        color = Slate500,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Normal
                     )
@@ -166,7 +202,7 @@ fun NewsCard(
                         Icon(
                             imageVector = Icons.Outlined.Share,
                             contentDescription = "Share",
-                            tint = Slate500,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(18.dp)
                         )
                     }
@@ -179,7 +215,7 @@ fun NewsCard(
                         Icon(
                             imageVector = if (article.isBookmarked) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                             contentDescription = "Bookmark",
-                            tint = if (article.isBookmarked) Indigo600 else Slate500,
+                            tint = if (article.isBookmarked) Indigo600 else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(20.dp)
                         )
                     }

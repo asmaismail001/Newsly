@@ -369,18 +369,20 @@ fun NewsDetailScreen(
                 }
 
                 // Video Player if available
-                if (!article.videoUrl.isNullOrBlank()) {
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(
-                            text = "News Broadcast Clip",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        com.example.newsly.ui.news.components.NewsVideoPlayer(
-                            videoUrl = article.videoUrl,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                article.videoUrl?.let { validVideoUrl ->
+                    if (com.example.newsly.util.VideoUrlValidator.isValidPlayableVideoUrl(validVideoUrl)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text(
+                                text = "News Broadcast Clip",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            com.example.newsly.ui.news.components.NewsVideoPlayer(
+                                videoUrl = validVideoUrl,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
 

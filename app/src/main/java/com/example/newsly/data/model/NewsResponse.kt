@@ -1,5 +1,6 @@
 package com.example.newsly.data.model
 
+import com.example.newsly.util.VideoUrlValidator
 import com.google.gson.annotations.SerializedName
 
 data class NewsApiResponse(
@@ -23,6 +24,9 @@ data class ApiArticleDto(
     @SerializedName("image") val image: String? = null,
     @SerializedName("imageUrl") val imageUrl: String? = null,
     @SerializedName("image_url") val imageUrlSnake: String? = null,
+    @SerializedName("video_url") val videoUrlSnake: String? = null,
+    @SerializedName("videoUrl") val videoUrlCamel: String? = null,
+    @SerializedName("video") val video: String? = null,
     @SerializedName("publishedAt") val publishedAt: String? = null,
     @SerializedName("published_at") val publishedAtSnake: String? = null,
     @SerializedName("pubDate") val pubDate: String? = null,
@@ -40,6 +44,13 @@ data class ApiArticleDto(
         }
         val safeId = id ?: url?.hashCode()?.toString() ?: title?.hashCode()?.toString() ?: System.currentTimeMillis().toString()
 
+        val rawVideo = videoUrlSnake ?: videoUrlCamel ?: video
+        val resolvedVideo = if (VideoUrlValidator.isValidPlayableVideoUrl(rawVideo)) {
+            VideoUrlValidator.sanitizeVideoUrl(rawVideo)
+        } else {
+            null
+        }
+
         return NewsArticle(
             id = safeId,
             title = title ?: "Headline unavailable",
@@ -47,6 +58,7 @@ data class ApiArticleDto(
             content = content ?: description ?: "",
             url = url ?: "",
             imageUrl = resolvedImage,
+            videoUrl = resolvedVideo,
             publishedAt = resolvedDate,
             sourceName = resolvedSource,
             author = author,

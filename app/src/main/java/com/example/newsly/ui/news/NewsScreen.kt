@@ -277,7 +277,7 @@ fun NewsScreen(
                 }
                 is NewsUiState.Success -> {
                     val allLoadedArticles = state.featuredArticles + state.articles
-                    val videoArticles = allLoadedArticles.filter { !it.videoUrl.isNullOrBlank() }
+                    val videoArticles = allLoadedArticles.filter { com.example.newsly.util.VideoUrlValidator.isValidPlayableVideoUrl(it.videoUrl) }
                     val breakingArticles = allLoadedArticles.filter { it.isBreaking }
 
                     LazyColumn(
