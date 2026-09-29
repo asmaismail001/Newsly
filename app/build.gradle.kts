@@ -72,6 +72,10 @@ dependencies {
     // DataStore for Persistent Theme & App Preferences
     implementation(libs.androidx.datastore.preferences)
 
+    // Jetpack Glance (App Widget)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

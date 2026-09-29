@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Newsly</string>
+    <string name="widget_description">Displays top latest news headlines from Newsly.</string>
+    <string name="widget_title">Newsly Top Headlines</string>
+    <string name="widget_refresh">Refresh</string>
+    <string name="widget_error_fallback">Couldn\'t load headlines</string>
+    <string name="widget_tap_to_retry">Tap refresh to try again</string>
 </resources>
